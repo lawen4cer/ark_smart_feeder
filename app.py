@@ -4,18 +4,15 @@ import time, threading
 import json
 from tkinter import *
 from discord_webhook import DiscordWebhook, DiscordEmbed
-data = {}
-def load_settings():
-    if os.path.exists('settings.json'):
-        with open('settings.json') as f:
-            global data
-            data = json.load(f)
 
+
+#initial setup
 screen_size = pyautogui.size()
 root = Tk()
 root.geometry('400x400+{0}+{1}'.format((int(screen_size[0]/2) - 200), (int(screen_size[1]/2) - 200)))
 root.title("Ark Smart Feeder")
 
+#global vars
 total_feed_var = IntVar()
 interval_var = IntVar()
 exit_to_main_var = IntVar()
@@ -23,7 +20,9 @@ discord_id_var = StringVar()
 discord_url_var = StringVar()
 start_time = 0.0
 feed_time = 0.0
+data = {}
 
+#function area
 def load_settings():
     if os.path.exists('settings.json'):
         with open('settings.json') as f:
@@ -33,7 +32,6 @@ def load_settings():
             discord_url_var.set(data['webhook_url'])
             print('Settings loaded successfully')
 
-#function area
 def exit_to_main_menu():
     pyautogui.press('esc')
     exit_button_coords = pyautogui.locateCenterOnScreen('images/exittomenu.png', confidence = 0.5)
@@ -116,38 +114,40 @@ def open_settings_window():
     settings_save_button = Button(settings_window, text="Save", command=save_settings)
     settings_save_button.grid(column=1, row = 10)        
  
+def build_root_window():
+    interval_label = Label(root, text="Feed Interval(Minutes)",justify=LEFT, anchor='w')
+    interval_label.grid(column=0, row=2)
+    interval_textbox = Entry(root, textvariable=interval_var)
+    interval_textbox.grid(column=1, row=2, columnspan=2)
 
-#script area
+
+    app_timer_label = Label(root, text="How long to feed in total(Minutes)",justify=LEFT,anchor='w')
+    app_timer_label.grid(column=0, row=1)
+    app_timer_textbox = Entry(root, textvariable=total_feed_var)
+    app_timer_textbox.grid(column=1, row=1, columnspan=2)
+
+    exit_to_main_checkbutton = Checkbutton(root, text="Exit to Main Menu when finished", variable=exit_to_main_var, onvalue=1, offvalue=0 )
+    exit_to_main_checkbutton.grid(column=0, row=9, columnspan=2)
+
+    start_button = Button(root, text="Start", command=start_transfer_thread)
+    start_button.grid(column=1, row=10)
+
+    open_settings_button = Button(root, text="Settings", command=open_settings_window)
+    open_settings_button.grid(column=0, row=10)
+
+#execution
 
 
 load_settings()
+build_root_window()
+root.mainloop()
 
 
 
-interval_label = Label(root, text="Feed Interval(Minutes)",justify=LEFT, anchor='w')
-interval_label.grid(column=0, row=2)
-interval_textbox = Entry(root, textvariable=interval_var)
-interval_textbox.grid(column=1, row=2, columnspan=2)
-
-
-app_timer_label = Label(root, text="How long to feed in total(Minutes)",justify=LEFT,anchor='w')
-app_timer_label.grid(column=0, row=1)
-app_timer_textbox = Entry(root, textvariable=total_feed_var)
-app_timer_textbox.grid(column=1, row=1, columnspan=2)
-
-exit_to_main_checkbutton = Checkbutton(root, text="Exit to Main Menu when finished", variable=exit_to_main_var, onvalue=1, offvalue=0 )
-exit_to_main_checkbutton.grid(column=0, row=9, columnspan=2)
-
-start_button = Button(root, text="Start", command=start_transfer_thread)
-start_button.grid(column=1, row=10)
-
-open_settings_button = Button(root, text="Settings", command=open_settings_window)
-open_settings_button.grid(column=0, row=10)
 
 
     
 
-root.mainloop()
 
 
 
